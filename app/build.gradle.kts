@@ -53,6 +53,9 @@ dependencies {
     implementation(libs.square.okhttp)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.retrofit.converter)
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

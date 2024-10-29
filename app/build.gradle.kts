@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.devtools.ksp")
+    //alias(libs.plugins.jetbrains.kotlin.kapt)
 }
 
 android {
@@ -54,7 +56,10 @@ dependencies {
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.retrofit.converter)
-
+    implementation(libs.squareup.moshi)
+    implementation(libs.squareup.retrofit.converter)
+//    kapt(libs.squareup.moshi.kotlin.codegen)
+    ksp(libs.squareup.moshi.kotlin.codegen)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

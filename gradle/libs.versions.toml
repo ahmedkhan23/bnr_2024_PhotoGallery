@@ -15,6 +15,7 @@ lifecycle = "2.8.6"
 retrofit = "2.9.0"
 okhttp = "4.9.3"
 coroutines = "1.6.0"
+moshi = "1.13.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,8 +35,13 @@ square-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp"
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines"}
 retrofit-converter = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit"}
+squareup-moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
+squareup-retrofit-converter = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit"}
+squareup-moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi"}
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+#jetbrains-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version = "1.6.10"}
 

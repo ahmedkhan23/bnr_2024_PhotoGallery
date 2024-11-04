@@ -58,7 +58,7 @@ dependencies {
     implementation(libs.retrofit.converter)
     implementation(libs.squareup.moshi)
     implementation(libs.squareup.retrofit.converter)
-//    kapt(libs.squareup.moshi.kotlin.codegen)
+    implementation(libs.coil)
     ksp(libs.squareup.moshi.kotlin.codegen)
 
     testImplementation(libs.junit)

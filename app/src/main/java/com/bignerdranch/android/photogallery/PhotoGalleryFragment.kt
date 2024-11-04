@@ -30,6 +30,7 @@ class PhotoGalleryFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
+    private var searchView: SearchView? = null
     private val photoGalleryViewModel: PhotoGalleryViewModel by viewModels()
 
     override fun onCreateView(
@@ -50,7 +51,7 @@ class PhotoGalleryFragment : Fragment() {
                 menuInflater.inflate(R.menu.fragment_photo_gallery, menu)
 
                 val searchItem: MenuItem = menu.findItem(R.id.menu_item_search)
-                val searchView = searchItem.actionView as? SearchView
+                searchView = searchItem.actionView as? SearchView
 
                 searchView?.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -75,15 +76,22 @@ class PhotoGalleryFragment : Fragment() {
                     }
                     else -> true
 
-                }                }
+                }
+            }
+
+            override fun onMenuClosed(menu: Menu) {
+                super.onMenuClosed(menu)
+                searchView = null
+            }
 
         }, viewLifecycleOwner)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoGalleryViewModel.galleryItems.collect { items ->
-                    Log.d(TAG, "Response received: $items")
-                    binding.photoGrid.adapter = PhotoListAdapter(items)
+                photoGalleryViewModel.uiState.collect { uiState ->
+                    Log.d(TAG, "Response received: ${uiState.images}")
+                    binding.photoGrid.adapter = PhotoListAdapter(uiState.images)
+                    searchView?.setQuery(uiState.query, false)
                 }
             }
         }

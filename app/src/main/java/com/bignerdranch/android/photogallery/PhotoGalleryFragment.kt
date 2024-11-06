@@ -92,6 +92,9 @@ class PhotoGalleryFragment : Fragment() {
                     Log.d(TAG, "Response received: ${uiState.images}")
                     binding.photoGrid.adapter = PhotoListAdapter(uiState.images)
                     searchView?.setQuery(uiState.query, false)
+                    if (uiState.query.isNotEmpty()) {
+                        searchView?.setIconifiedByDefault(false)
+                    }
                 }
             }
         }

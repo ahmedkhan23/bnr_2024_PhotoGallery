@@ -17,15 +17,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.bignerdranch.android.photogallery.databinding.FragmentPhotoGalleryBinding
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 private const val TAG = "PhotoGalleryFragment"
+private const val POLL_WORK = "POLL_WORK"
 
 class PhotoGalleryFragment : Fragment() {
 
@@ -36,23 +40,8 @@ class PhotoGalleryFragment : Fragment() {
         }
 
     private var searchView: SearchView? = null
+    private var pollingMenuItem: MenuItem? = null
     private val photoGalleryViewModel: PhotoGalleryViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.UNMETERED)
-            .build()
-
-        val workRequest = OneTimeWorkRequest
-            .Builder(PollWorker::class.java)
-            .setConstraints(constraints)
-            .build()
-
-        WorkManager.getInstance(requireContext())
-            .enqueue(workRequest)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,6 +62,7 @@ class PhotoGalleryFragment : Fragment() {
 
                 val searchItem: MenuItem = menu.findItem(R.id.menu_item_search)
                 searchView = searchItem.actionView as? SearchView
+                pollingMenuItem = menu.findItem(R.id.menu_item_toggle_polling)
 
                 searchView?.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -95,6 +85,10 @@ class PhotoGalleryFragment : Fragment() {
                         photoGalleryViewModel.setQuery("")
                         true
                     }
+                    R.id.menu_item_toggle_polling -> {
+                        photoGalleryViewModel.togglePolling()
+                        true
+                    }
                     else -> true
 
                 }
@@ -113,9 +107,10 @@ class PhotoGalleryFragment : Fragment() {
                     Log.d(TAG, "Response received: ${uiState.images}")
                     binding.photoGrid.adapter = PhotoListAdapter(uiState.images)
                     searchView?.setQuery(uiState.query, false)
-                    if (uiState.query.isNotEmpty()) {
-                        searchView?.setIconifiedByDefault(false)
-                    }
+//                    if (uiState.query.isNotEmpty()) {
+//                        searchView?.setIconifiedByDefault(false)
+//                    }
+                    updatePollingState(uiState.isPolling)
                 }
             }
         }
@@ -125,5 +120,34 @@ class PhotoGalleryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun updatePollingState(isPolling: Boolean) {
+        val toggleItemTitle = if (isPolling) {
+            R.string.stop_polling
+        }
+        else {
+            R.string.start_polling
+        }
+        pollingMenuItem?.setTitle(toggleItemTitle)
+
+        if (isPolling) {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.UNMETERED)
+                .build()
+            val periodicRequest =
+                PeriodicWorkRequestBuilder<PollWorker>(15, TimeUnit.MINUTES)
+                    .setConstraints(constraints)
+                    .build()
+            WorkManager.getInstance(requireContext())
+                .enqueueUniquePeriodicWork(
+                    POLL_WORK,
+                    ExistingPeriodicWorkPolicy.KEEP,
+                    periodicRequest
+                )
+        }
+        else {
+            WorkManager.getInstance(requireContext()).cancelUniqueWork(POLL_WORK)
+        }
     }
 }

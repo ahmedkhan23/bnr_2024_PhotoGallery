@@ -17,6 +17,7 @@ class PreferencesRepository private constructor(
 
     companion object {
         private val SEARCH_QUERY_KEY = stringPreferencesKey("search_query")
+        private val PREF_LAST_RESULT_ID = stringPreferencesKey("lastResultId")
         private var INSTANCE: PreferencesRepository? = null
 
         fun initialize(context: Context) {
@@ -37,6 +38,16 @@ class PreferencesRepository private constructor(
     val storedQuery: Flow<String> = dataStore.data.map {
         it[SEARCH_QUERY_KEY] ?: ""
     }.distinctUntilChanged()
+
+    val lastResultId: Flow<String> = dataStore.data.map {
+        it[PREF_LAST_RESULT_ID] ?: ""
+    }.distinctUntilChanged()
+
+    suspend fun setLastResultId(lastResultId: String) {
+        dataStore.edit {
+            it[PREF_LAST_RESULT_ID] = lastResultId
+        }
+    }
 
     suspend fun setStoredQuery(query: String) {
         dataStore.edit {

@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.squareup.retrofit.converter)
     implementation(libs.coil)
     implementation(libs.datastore)
+    implementation(libs.workmanager)
     ksp(libs.squareup.moshi.kotlin.codegen)
 
     testImplementation(libs.junit)

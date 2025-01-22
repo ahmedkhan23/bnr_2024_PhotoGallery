@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -5,11 +8,21 @@ plugins {
     //alias(libs.plugins.jetbrains.kotlin.kapt)
 }
 
+val localProperties = Properties()
+val localFile = rootProject.file("local.properties")
+if (localFile.exists()) {
+    localProperties.load(FileInputStream(localFile))
+}
+
+val myApiKey = localProperties.getProperty("API_KEY")
+
 android {
     namespace = "com.bignerdranch.android.photogallery"
     compileSdk = 34
 
     defaultConfig {
+        buildConfigField("String", "API_KEY", "\"$myApiKey\"")
+
         applicationId = "com.bignerdranch.android.photogallery"
         minSdk = 24
         targetSdk = 34
@@ -37,6 +50,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
